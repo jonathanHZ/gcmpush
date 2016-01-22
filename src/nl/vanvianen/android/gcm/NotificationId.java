@@ -6,6 +6,10 @@ public class NotificationId {
 
     private static NotificationId instance = null;
     private static final AtomicInteger id = new AtomicInteger(0);
+
+    protected NotificationId() {
+        // TODO: Get the current value of id from the activity state and update id.
+    }
     
     /**
      * Returns the instance of NotificationId. This should be used to get
