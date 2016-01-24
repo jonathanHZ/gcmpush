@@ -27,7 +27,7 @@ public class NotificationId {
      * @return int A unique id to use in the notify method on Notification.
      */
     public int getUniqueId() {
-        int currentId = id.getAndAdd(1);
+        return id.getAndAdd(1);
     }
 
 }
