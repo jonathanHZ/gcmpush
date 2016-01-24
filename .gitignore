@@ -2,3 +2,4 @@ build
 dist
 libs
 build.properties
+.idea
