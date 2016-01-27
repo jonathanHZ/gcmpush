@@ -319,11 +319,10 @@ public class GCMIntentService extends GCMBaseIntentService {
         /* Create intent to (re)start the app's root activity */
         String pkg = TiApplication.getInstance().getApplicationContext().getPackageName();
         Intent launcherIntent = TiApplication.getInstance().getApplicationContext().getPackageManager().getLaunchIntentForPackage(pkg);
-        launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
         launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-        launcherIntent.putExtra("AUCTION_ID", 123);
-        launcherIntent.putExtra("STATUS", "active")
+        System.out.println("Message attached to intent: " + json.toString());
+        launcherIntent.putExtra("AUCTION_DATA", json.toString());
 
 
         /* Grab notification content from data according to provided keys if not already set */
@@ -360,7 +359,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                     .setContentTitle(title)
                     .setContentText(message)
                     .setTicker(ticker)
-                    .setContentIntent(PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT))
+                    .setContentIntent(PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_CANCEL_CURRENT))
                     .setSmallIcon(smallIcon)
                     .setLargeIcon(bitmap);
 
