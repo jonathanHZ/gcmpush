@@ -447,6 +447,9 @@ public class GCMIntentService extends GCMBaseIntentService {
             }
 
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+            System.out.println("Intent object: " + notification.contentIntent);
+            System.out.println("Intent package: " + notification.contentIntent.getCreatorPackage());
             
             int id = NotificationId.getInstance().getUniqueId(); 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(id, notification);
