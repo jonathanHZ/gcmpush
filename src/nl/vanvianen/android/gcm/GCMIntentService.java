@@ -355,11 +355,12 @@ public class GCMIntentService extends GCMBaseIntentService {
                 Log.d(LCAT, "No large icon found");
             }
 
+            int pendingIntentId = NotificationId.getInstance().getUniqueId();
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setTicker(ticker)
-                    .setContentIntent(PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(this, pendingIntentId, launcherIntent, PendingIntent.FLAG_CANCEL_CURRENT))
                     .setSmallIcon(smallIcon)
                     .setLargeIcon(bitmap);
 
