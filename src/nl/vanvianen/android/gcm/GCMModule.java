@@ -364,4 +364,10 @@ public class GCMModule extends KrollModule {
     public static GCMModule getInstance() {
         return instance;
     }
+
+    @Kroll.method
+    public void setAppBadge(int count) {
+    	BadgeUtils.setBadge(TiApplication.getInstance().getApplicationContext(), count);
+    }
+
 }

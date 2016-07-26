@@ -452,6 +452,13 @@ public class GCMIntentService extends GCMBaseIntentService {
             }
             Log.i(LCAT, "Insistent: " + insistent);
 
+            /* Badging */
+            if (data.get("badge") != null) {
+            	int badge = Integer.parseInt((String) data.get("badge"));
+            	BadgeUtils.setBadge(context, badge);
+            	builder.setNumber(badge);
+            }
+
             /* notificationId, set in push payload to specify multiple notifications should be shown. If not specified, subsequent notifications "override / overwrite" the older ones */
             if (data.get("notificationId") != null) {
                 if (data.get("notificationId") instanceof Integer) {
