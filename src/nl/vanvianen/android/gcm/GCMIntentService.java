@@ -454,7 +454,14 @@ public class GCMIntentService extends GCMBaseIntentService {
 
             /* Badging */
             if (data.get("badge") != null) {
-            	int badge = Integer.parseInt((String) data.get("badge"));
+            	Integer badge = 0;
+            	try {
+            	      badge = Integer.parseInt((String) data.get("badge"));
+			          Log.i(LCAT, "Badge received: " + badge);
+            	} catch (NumberFormatException e) {
+            	      badge = 0;
+			          Log.i(LCAT, "Badge parseInt failed. Received " + data.get("badge") + ", setting to " + badge);
+            	}
             	BadgeUtils.setBadge(context, badge);
             	builder.setNumber(badge);
             }
