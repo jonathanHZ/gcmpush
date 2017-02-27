@@ -20,8 +20,4 @@ package nl.vanvianen.android.gcm;
  * GCMNotificationBigPicture
  */
 public class GCMNotificationBigPicture {
-
-    public GCMNotificationBigPicture (parameters) {
-        
-    }
 }
