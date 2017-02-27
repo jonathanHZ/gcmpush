@@ -1,5 +1,8 @@
 .DS_Store
+.idea
+.project
 build
+bin
 dist
 libs
 build.properties
