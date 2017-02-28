@@ -373,114 +373,54 @@ public class GCMIntentService extends GCMBaseIntentService {
                 Log.d(LCAT, "No large icon found");
             }
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
+            /*NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setTicker(ticker)
-                    .setContentIntent(PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT))
+                    .setContentIntent(pendingIntent)
                     .setSmallIcon(smallIcon)
-                    .setLargeIcon(bitmap);
+                    .setLargeIcon(bitmap);*/
 
             /* Name of group to group similar notifications together, can also be set in the push notification payload */
-            if (data.get("group") != null) {
+            /*if (data.get("group") != null) {
                 group = (String) data.get("group");
-            }
-            if (group != null) {
-                builder.setGroup(group);
-            }
-            Log.i(LCAT, "Group: " + group);
+            }*/
+            /*if (group != null) {
+                builder.setGroup(group);//-->
+            }*/
+            /*Log.i(LCAT, "Group: " + group);*/
 
             /* Whether notification should be for this device only or bridged to other devices, can also be set in the push notification payload */
-            if (data.get("localOnly") != null) {
+            /*if (data.get("localOnly") != null) {
                 localOnly = Boolean.valueOf((String) data.get("localOnly"));
             }
-            builder.setLocalOnly(localOnly);
-            Log.i(LCAT, "LocalOnly: " + localOnly);
+            builder.setLocalOnly(localOnly);//-->
+            Log.i(LCAT, "LocalOnly: " + localOnly);*/
 
             /* Specify notification priority, can also be set in the push notification payload */
-            if (data.get("priority") != null) {
+            /*if (data.get("priority") != null) {
                 priority = Integer.parseInt((String) data.get("priority"));
-            }
-            if (priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX) {
+            }*/
+            /*if (priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX) {
                 builder.setPriority(priority);
                 Log.i(LCAT, "Priority: " + priority);
             } else {
                 Log.e(LCAT, "Ignored invalid priority " + priority);
-            }
+            }*/
 
             /* Specify whether bigtext should be used, can also be set in the push notification payload */
-            if (data.get("bigText") != null) {
+            //****************>Refactor BigTextStyle
+            /*if (data.get("bigText") != null) {
                 bigText = Boolean.valueOf((String) data.get("bigText"));
             }
+            
             if (bigText) {
                 builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
             }
-            Log.i(LCAT, "bigText: " + bigText);
+            Log.i(LCAT, "bigText: " + bigText);****************/
 
-            Notification notification = builder.build();
-
-            /* Sound, can also be set in the push notification payload */
-            if (data.get("sound") != null) {
-                Log.d(LCAT, "Sound specified in notification");
-                sound = (String) data.get("sound");
-            }
-
-            if ("default".equals(sound)) {
-                Log.i(LCAT, "Sound: default sound");
-                notification.defaults |= Notification.DEFAULT_SOUND;
-            } else if (sound != null) {
-                Log.i(LCAT, "Sound " + sound);
-                notification.sound = Uri.parse("android.resource://" + pkg + "/" + getResource("raw", sound));
-            }
-
-            /* Vibrate, can also be set in the push notification payload */
-            if (data.get("vibrate") != null) {
-                vibrate = Boolean.valueOf((String) data.get("vibrate"));
-            }
-            if (vibrate) {
-                notification.defaults |= Notification.DEFAULT_VIBRATE;
-            }
-            Log.i(LCAT, "Vibrate: " + vibrate);
-
-            /* Insistent, can also be set in the push notification payload */
-            if ("true".equals(data.get("insistent"))) {
-                insistent = true;
-            }
-            if (insistent) {
-                notification.flags |= Notification.FLAG_INSISTENT;
-            }
-            Log.i(LCAT, "Insistent: " + insistent);
-
-            /* notificationId, set in push payload to specify multiple notifications should be shown. If not specified, subsequent notifications "override / overwrite" the older ones */
-            if (data.get("notificationId") != null) {
-                if (data.get("notificationId") instanceof Integer) {
-                    notificationId = (Integer) data.get("notificationId");
-                } else if (data.get("notificationId") instanceof String) {
-                    try {
-                        notificationId = Integer.parseInt((String) data.get("notificationId"));
-                    } catch (NumberFormatException ex) {
-                        Log.e(LCAT, "Invalid setting notificationId, should be Integer");
-                    }
-                } else {
-                    Log.e(LCAT, "Invalid setting notificationId, should be Integer");
-                }
-            }
-            Log.i(LCAT, "Notification ID: " + notificationId);
-
-            /* Specify LED flashing */
-            if (ledOn != null || ledOff != null) {
-                notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-                if (ledOn != null) {
-                    notification.ledOnMS = ledOn;
-                }
-                if (ledOff != null) {
-                    notification.ledOffMS = ledOff;
-                }
-            } else {
-                notification.defaults |= Notification.DEFAULT_LIGHTS;
-            }
-
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            Notification notification = new GCMNotification(context, title, message, ticker, pendingIntent, smallIcon, bitmap, pkg, data).notification();
 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(notificationId, notification);
         }
