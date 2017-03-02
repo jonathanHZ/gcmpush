@@ -37,6 +37,7 @@ public class GCMNotification {
     public String sound = null;
     public boolean vibrate = false;
     public boolean insistent = false;
+    public boolean silent = false;
     public int notificationId = 1;
     public Integer ledOn = null;
     public Integer ledOff = null;
@@ -115,37 +116,41 @@ public class GCMNotification {
             priority = Integer.parseInt((String) data.get("priority"));
         }
 
-        /* Sound, can also be set in the push notification payload */
-        if (data.get("sound") != null) {
-            Log.d(LCAT, "Sound specified in notification");
-            sound = (String) data.get("sound");
-        }
+        if (data.get("silent") != null && "false".equals(data.get("silent"))) {
 
-        if ("default".equals(sound)) {
-            Log.i(LCAT, "Sound: default sound");
-            notification.defaults |= Notification.DEFAULT_SOUND;
-        } else if (sound != null) {
-            Log.i(LCAT, "Sound " + sound);
-            notification.sound = Uri.parse("android.resource://" + pkg + "/" + getResource("raw", sound));
-        }
+            /* Sound, can also be set in the push notification payload */
+            if (data.get("sound") != null) {
+                Log.d(LCAT, "Sound specified in notification");
+                sound = (String) data.get("sound");
+            }
 
-        /* Vibrate, can also be set in the push notification payload */
-        if (data.get("vibrate") != null) {
-            vibrate = Boolean.valueOf((String) data.get("vibrate"));
-        }
-        if (vibrate) {
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
-        }
-        Log.i(LCAT, "Vibrate: " + vibrate);
+            if ("default".equals(sound)) {
+                Log.i(LCAT, "Sound: default sound");
+                notification.defaults |= Notification.DEFAULT_SOUND;
+            } else if (sound != null) {
+                Log.i(LCAT, "Sound " + sound);
+                notification.sound = Uri.parse("android.resource://" + pkg + "/" + getResource("raw", sound));
+            }
 
-        /* Insistent, can also be set in the push notification payload */
-        if ("true".equals(data.get("insistent"))) {
-            insistent = true;
+            /* Vibrate, can also be set in the push notification payload */
+            if (data.get("vibrate") != null) {
+                vibrate = Boolean.valueOf((String) data.get("vibrate"));
+            }
+            if (vibrate) {
+                notification.defaults |= Notification.DEFAULT_VIBRATE;
+            }
+            Log.i(LCAT, "Vibrate: " + vibrate);
+
+            /* Insistent, can also be set in the push notification payload */
+            if ("true".equals(data.get("insistent"))) {
+                insistent = true;
+            }
+            if (insistent) {
+                notification.flags |= Notification.FLAG_INSISTENT;
+            }
+            Log.i(LCAT, "Insistent: " + insistent);
+
         }
-        if (insistent) {
-            notification.flags |= Notification.FLAG_INSISTENT;
-        }
-        Log.i(LCAT, "Insistent: " + insistent);
 
         /* notificationId, set in push payload to specify multiple notifications should be shown. If not specified, subsequent notifications "override / overwrite" the older ones */
         if (data.get("notificationId") != null) {
