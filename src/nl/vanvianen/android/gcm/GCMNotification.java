@@ -78,15 +78,11 @@ public class GCMNotification {
                 .setContentText(message).setTicker(ticker).setContentIntent(pendingIntent).setSmallIcon(smallIcon)
                 .setLargeIcon(bitmap);
 
-        if (group != null) {
-            builder.setGroup(group);//-->
-        }
+        if (group != null) builder.setGroup(group);
 
         builder.setLocalOnly(localOnly);
 
-        if (data.get("priority") != null) {
-            priority = Integer.parseInt((String) data.get("priority"));
-        }
+        if (data.get("priority") != null) priority = Integer.parseInt((String) data.get("priority"));
 
         if (priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX) {
             builder.setPriority(priority);
@@ -101,20 +97,14 @@ public class GCMNotification {
     public Notification notification() {
         Notification notification = buildNotification().build();
 
-        if (data.get("group") != null) {
-            group = (String) data.get("group");
-        }
+        if (data.get("group") != null) group = (String) data.get("group");
         Log.i(LCAT, "Group: " + group);
 
         /* Whether notification should be for this device only or bridged to other devices, can also be set in the push notification payload */
-        if (data.get("localOnly") != null) {
-            localOnly = Boolean.valueOf((String) data.get("localOnly"));
-        }
+        if (data.get("localOnly") != null) localOnly = Boolean.valueOf((String) data.get("localOnly"));
         Log.i(LCAT, "LocalOnly: " + localOnly);
 
-        if (data.get("priority") != null) {
-            priority = Integer.parseInt((String) data.get("priority"));
-        }
+        if (data.get("priority") != null) priority = Integer.parseInt((String) data.get("priority"));
 
         if (data.get("silent") != null && "false".equals(data.get("silent"))) {
 
@@ -133,21 +123,13 @@ public class GCMNotification {
             }
 
             /* Vibrate, can also be set in the push notification payload */
-            if (data.get("vibrate") != null) {
-                vibrate = Boolean.valueOf((String) data.get("vibrate"));
-            }
-            if (vibrate) {
-                notification.defaults |= Notification.DEFAULT_VIBRATE;
-            }
+            if (data.get("vibrate") != null) vibrate = Boolean.valueOf((String) data.get("vibrate"));
+            if (vibrate) notification.defaults |= Notification.DEFAULT_VIBRATE;
             Log.i(LCAT, "Vibrate: " + vibrate);
 
             /* Insistent, can also be set in the push notification payload */
-            if ("true".equals(data.get("insistent"))) {
-                insistent = true;
-            }
-            if (insistent) {
-                notification.flags |= Notification.FLAG_INSISTENT;
-            }
+            if ("true".equals(data.get("insistent"))) insistent = true;
+            if (insistent) notification.flags |= Notification.FLAG_INSISTENT;
             Log.i(LCAT, "Insistent: " + insistent);
 
         }
