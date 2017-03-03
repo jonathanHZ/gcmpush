@@ -74,16 +74,25 @@ public class GCMNotification {
     }
 
     public NotificationCompat.Builder buildNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context).setContentTitle(title)
-                .setContentText(message).setTicker(ticker).setContentIntent(pendingIntent).setSmallIcon(smallIcon)
-                .setLargeIcon(bitmap);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setTicker(ticker)
+            .setContentIntent(pendingIntent)
+            .setSmallIcon(smallIcon)
+            .setLargeIcon(bitmap);
+        
+        if (data.get("group") != null) group = (String) data.get("group");
+        Log.i(LCAT, "Group: " + group);
+
+        /* Whether notification should be for this device only or bridged to other devices, can also be set in the push notification payload */
+        if (data.get("localOnly") != null) localOnly = Boolean.valueOf((String) data.get("localOnly"));
+        Log.i(LCAT, "LocalOnly: " + localOnly);
+        builder.setLocalOnly(localOnly);
 
         if (group != null) builder.setGroup(group);
 
-        builder.setLocalOnly(localOnly);
-
         if (data.get("priority") != null) priority = Integer.parseInt((String) data.get("priority"));
-
         if (priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX) {
             builder.setPriority(priority);
             Log.i(LCAT, "Priority: " + priority);
@@ -97,27 +106,15 @@ public class GCMNotification {
     public Notification notification() {
         Notification notification = buildNotification().build();
 
-        if (data.get("group") != null) group = (String) data.get("group");
-        Log.i(LCAT, "Group: " + group);
-
-        /* Whether notification should be for this device only or bridged to other devices, can also be set in the push notification payload */
-        if (data.get("localOnly") != null) localOnly = Boolean.valueOf((String) data.get("localOnly"));
-        Log.i(LCAT, "LocalOnly: " + localOnly);
-
-        if (data.get("priority") != null) priority = Integer.parseInt((String) data.get("priority"));
-
+        /*Silent, can also be set in the push notification payload */
         if (data.get("silent") != null && "false".equals(data.get("silent"))) {
 
             /* Sound, can also be set in the push notification payload */
-            if (data.get("sound") != null) {
-                Log.d(LCAT, "Sound specified in notification");
-                sound = (String) data.get("sound");
-            }
-
-            if ("default".equals(sound)) {
+            if (data.get("sound") != null && "default".equals(sound)) {
                 Log.i(LCAT, "Sound: default sound");
                 notification.defaults |= Notification.DEFAULT_SOUND;
             } else if (sound != null) {
+                sound = (String) data.get("sound");
                 Log.i(LCAT, "Sound " + sound);
                 notification.sound = Uri.parse("android.resource://" + pkg + "/" + getResource("raw", sound));
             }
@@ -131,34 +128,29 @@ public class GCMNotification {
             if ("true".equals(data.get("insistent"))) insistent = true;
             if (insistent) notification.flags |= Notification.FLAG_INSISTENT;
             Log.i(LCAT, "Insistent: " + insistent);
-
         }
 
-        /* notificationId, set in push payload to specify multiple notifications should be shown. If not specified, subsequent notifications "override / overwrite" the older ones */
-        if (data.get("notificationId") != null) {
-            if (data.get("notificationId") instanceof Integer) {
-                notificationId = (Integer) data.get("notificationId");
-            } else if (data.get("notificationId") instanceof String) {
-                try {
-                    notificationId = Integer.parseInt((String) data.get("notificationId"));
-                } catch (NumberFormatException ex) {
-                    Log.e(LCAT, "Invalid setting notificationId, should be Integer");
-                }
-            } else {
+        /* notificationId, set in push payload to specify multiple notifications should be shown. If not specified, subsequent notifications 
+        "override / overwrite" the older ones */
+        if (data.get("notificationId") != null && data.get("notificationId") instanceof Integer) {
+            notificationId = (Integer) data.get("notificationId");
+        } else if (data.get("notificationId") != null && data.get("notificationId") instanceof String) {
+            try {
+                notificationId = Integer.parseInt((String) data.get("notificationId"));
+            } catch (NumberFormatException ex) {
                 Log.e(LCAT, "Invalid setting notificationId, should be Integer");
             }
+        } else {
+            Log.e(LCAT, "Invalid setting notificationId, should be Integer");
         }
+        notification.number = notificationId;
         Log.i(LCAT, "Notification ID: " + notificationId);
 
         /* Specify LED flashing */
         if (ledOn != null || ledOff != null) {
             notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-            if (ledOn != null) {
-                notification.ledOnMS = ledOn;
-            }
-            if (ledOff != null) {
-                notification.ledOffMS = ledOff;
-            }
+            if (ledOn != null)  notification.ledOnMS = ledOn;
+            if (ledOff != null) notification.ledOffMS = ledOff;
         } else {
             notification.defaults |= Notification.DEFAULT_LIGHTS;
         }
